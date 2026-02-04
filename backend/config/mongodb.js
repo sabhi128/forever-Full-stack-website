@@ -16,7 +16,6 @@ const connectDB = async () => {
     // If connection is in progress, wait for it
     if (!cached.promise) {
         const opts = {
-            bufferCommands: false,
             maxPoolSize: 10,
         };
 
