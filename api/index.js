@@ -9,11 +9,23 @@ import cartRouter from '../backend/routes/cartRoute.js'
 import orderRouter from '../backend/routes/orderRoute.js'
 
 const app = express()
-connectDB()
+
+// Initialize Cloudinary
 connectCloudinary()
 
 app.use(express.json())
 app.use(cors())
+
+// Ensure DB connection before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB()
+    next()
+  } catch (error) {
+    console.error('Database connection error:', error)
+    res.status(500).json({ success: false, message: 'Database connection failed' })
+  }
+})
 
 app.use('/api/user', userRouter)
 app.use('/api/product', productRouter)
