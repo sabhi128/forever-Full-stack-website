@@ -1,11 +1,13 @@
 import { v2 as cloudinary } from "cloudinary";
 import productModel from "../models/productModel.js";
 import mongoose from "mongoose";
+import connectDB from "../config/mongodb.js";
 
 // function for add product
 const addProduct = async (req, res) => {
 
     try {
+        await connectDB(); // Ensure connection is established right here
 
         const { name, description, price, category, subCategory, sizes, bestseller } = req.body
 
