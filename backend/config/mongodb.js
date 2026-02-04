@@ -43,7 +43,7 @@ const connectDB = async () => {
             console.error("MongoDB connection error:", err);
         });
 
-        cached.promise = mongoose.connect(`${MONGODB_URI}/e-commerce`, opts)
+        cached.promise = mongoose.connect(`${MONGODB_URI}`, opts)
             .then((mongoose) => {
                 console.log("MongoDB connection established");
                 return mongoose;
