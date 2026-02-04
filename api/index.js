@@ -32,6 +32,20 @@ app.use('/api/product', productRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/order', orderRouter)
 
+app.get('/api/health', async (req, res) => {
+  const hasMongoUri = !!process.env.MONGODB_URI;
+  const hasCloudinaryKey = !!process.env.CLOUDINARY_API_KEY;
+
+  res.json({
+    success: true,
+    env: {
+      MONGODB_URI: hasMongoUri ? 'SET' : 'NOT SET',
+      CLOUDINARY_API_KEY: hasCloudinaryKey ? 'SET' : 'NOT SET',
+    },
+    mongooseState: ['disconnected', 'connected', 'connecting', 'disconnecting'][require('mongoose').connection.readyState] || 'unknown'
+  });
+})
+
 app.get('/api', (req, res) => {
   res.send("API Working")
 })
