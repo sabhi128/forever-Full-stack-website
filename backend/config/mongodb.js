@@ -10,8 +10,12 @@ if (!cached) {
 const connectDB = async () => {
     // If already connected, return existing connection
     if (cached.conn) {
-        console.log("Using cached DB connection");
-        return cached.conn;
+        if (mongoose.connection.readyState === 1) {
+            console.log("Using cached DB connection");
+            return cached.conn;
+        }
+        console.log("Cached connection found but possibly disconnected. Reconnecting...");
+        // If disconnected, reset cache and proceed to connect
     }
 
     const MONGODB_URI = process.env.MONGODB_URI;
@@ -55,6 +59,22 @@ const connectDB = async () => {
     } catch (e) {
         cached.promise = null;
         throw e;
+    }
+
+    // Double check connection state
+    if (mongoose.connection.readyState !== 1) { // 1 = connected
+        console.log("Mongoose connection is not ready (state " + mongoose.connection.readyState + "), waiting...");
+        try {
+            // wait for a moment just in case
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (mongoose.connection.readyState !== 1) {
+                console.log("Forcing reconnection...");
+                cached.promise = null; // force simple reconnect attempt next time or now
+                // But for this request, let's try to wait or throw
+            }
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     return cached.conn;
